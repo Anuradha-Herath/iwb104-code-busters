@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import './Navbar.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-
 const Navbar = () => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -10,8 +9,8 @@ const Navbar = () => {
     <nav className="navbar">
       {/* Logo */}
       <div className="logo">
-        <span style={{ color: 'black' }}>Home</span>
-        <span style={{ color: 'green' }}>Servo</span>
+        <span>Home</span>
+        <span>Servo</span>
       </div>
 
       {/* Nav Links */}
@@ -30,6 +29,7 @@ const Navbar = () => {
       <button
         className="mobile-menu-icon"
         onClick={() => setIsMobile(!isMobile)}
+        aria-label="Toggle mobile menu"
       >
         {isMobile ? <i className="fas fa-times"></i> : <i className="fas fa-bars"></i>}
       </button>
