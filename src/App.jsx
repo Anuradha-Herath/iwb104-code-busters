@@ -19,33 +19,6 @@ import Admin from './Components/Admin/Admin';
 
 const AppContent = () => {
   const location = useLocation();
-
-  // List of routes where you don't want to show the Navbar
-  const hideNavbarPaths = ['/admin'];
-
-  return (
-    <div className="app-container">
-      {/* Only show Navbar if current path is NOT in hideNavbarPaths */}
-      {!hideNavbarPaths.includes(location.pathname) && <Navbar />}
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/services" element={<ServiceCards />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/become-tasker" element={<TaskerForm />} />
-        <Route path="/profilepage" element={<ProfilePage />} />
-        <Route path="/seller" element={<Seller />} />
-        <Route path="/book" element={<BookingForm />} />
-        <Route path="/admin" element={<Admin />} />
-      </Routes>
-    </div>
-  );
-};
-
-const AppContent = () => {
-  const location = useLocation();
   
   // Check if current path is a tasker route
   const isTaskerRoute = location.pathname.startsWith('/tasker');
