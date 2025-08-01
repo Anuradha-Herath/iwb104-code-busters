@@ -42,6 +42,7 @@ const AppContent = () => {
         <Route path="/tasker/bookings" element={<TaskerBookings />} />  {/* Tasker Bookings page */}
         <Route path="/seller" element={<Seller />} />
         <Route path="/book" element={<BookingForm />} />
+        <Route path="/admin/*" element={<Admin />} />  {/* Admin panel */}
         {/* Add more routes as needed */}
       </Routes>
 
