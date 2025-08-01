@@ -1,25 +1,60 @@
-name: Manual PR Check
+name: Manual PR Build Check for React (dev branch)
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Pull Request number to check'
+        required: true
+        type: string
 
 jobs:
-  pr-check:
+  manual-react-build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout PR code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 
+    - name: Install GitHub CLI and jq
+      run: |
+        sudo apt update
+        sudo apt install -y gh jq
+        echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'  
+    - name: Get PR Info and Validate Target Branch
+      id: check-pr
+      run: |
+        PR_NUMBER=${{ github.event.inputs.pr_number }}
+        echo "Checking PR #$PR_NUMBER"
+        
+        PR_INFO=$(gh pr view "$PR_NUMBER" --json baseRefName)
+        TARGET_BRANCH=$(echo "$PR_INFO" | jq -r .baseRefName)
 
-      - name: Install dependencies with legacy peer deps
-        run: npm install --legacy-peer-deps
+        echo "Target branch is $TARGET_BRANCH"
+        if [ "$TARGET_BRANCH" != "dev" ]; then
+          echo "❌ This PR does not target the 'dev' branch."
+          exit 1
+        fi
+        echo "✅ PR targets 'dev' branch. Proceeding."
 
-      - name: Build project
-        run: npm run build
+    - name: Checkout PR Code
+      run: |
+        gh pr checkout ${{ github.event.inputs.pr_number }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Build React App
+      run: npm run build
+
+    - name: Verify Build Output (Optional)
+      run: |
+        if [ -d "build" ]; then
+          echo "✅ Build directory created successfully."
+        else
+          echo "❌ Build failed — 'build' directory not found."
+          exit 1
+        fi
