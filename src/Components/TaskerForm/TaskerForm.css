@@ -349,6 +349,48 @@ form p a:hover {
   }
 }
 
+/* Password field styling */
+form input[type="password"] {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1f2937;
+  background: white;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+form input[type="password"]:focus {
+  outline: none;
+  border-color: #218838;
+  box-shadow: 0 0 0 4px rgb(33 136 56 / 0.1);
+  transform: translateY(-1px);
+}
+
+/* Number input styling */
+form input[type="number"] {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1f2937;
+  background: white;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+form input[type="number"]:focus {
+  outline: none;
+  border-color: #218838;
+  box-shadow: 0 0 0 4px rgb(33 136 56 / 0.1);
+  transform: translateY(-1px);
+}
+
 #tasker-form {
   animation: slideInUp 0.6s ease-out;
 }

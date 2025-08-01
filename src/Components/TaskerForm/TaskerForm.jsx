@@ -4,26 +4,50 @@ import { useNavigate } from 'react-router-dom';  // Import useNavigate
 
 const TaskerForm = () => {
   const [formData, setFormData] = useState({
+    // Signup fields
+    username: '',
+    password: '',
+    confirmPassword: '',
+    // Personal Information
     fullName: '',
     email: '',
     phoneNumber: '',
+    // Address Information
     addressLine1: '',
     addressLine2: '',
     city: '',
     stateProvince: '',
     postalCode: '',
     country: '',
-    category: ''
+    // Professional Information
+    category: '',
+    experience: '',
+    hourlyRate: '',
+    bio: '',
+    skills: '',
+    profileImage: null
   });
 
   const navigate = useNavigate();  // Initialize the useNavigate hook
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, files } = e.target;
+    if (type === 'file') {
+      setFormData({ ...formData, [name]: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate password confirmation
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match!');
+      return;
+    }
+    
     try {
       const response = await fetch('http://localhost:5001/api/taskers', {
         method: 'POST',
@@ -32,7 +56,7 @@ const TaskerForm = () => {
       });
       if (response.ok) {
         alert('You are a Tasker now!');
-        navigate('/seller');  // Redirect to Seller page after successful signup
+        navigate('/tasker/profile');  // Redirect to Tasker Profile page after successful signup
       } else {
         alert('Error submitting application');
       }
@@ -46,6 +70,40 @@ const TaskerForm = () => {
       <h1>Become a Tasker</h1>
       <p>Join our community of skilled Taskers and start earning!</p>
       <form onSubmit={handleSubmit}>
+        <h2>Account Information</h2>
+        <input 
+          type="text" 
+          name="username" 
+          placeholder="Username" 
+          value={formData.username} 
+          onChange={handleChange} 
+          required 
+        />
+        <input 
+          type="password" 
+          name="password" 
+          placeholder="Password" 
+          value={formData.password} 
+          onChange={handleChange} 
+          required 
+        />
+        <input 
+          type="password" 
+          name="confirmPassword" 
+          placeholder="Confirm Password" 
+          value={formData.confirmPassword} 
+          onChange={handleChange} 
+          required 
+        />
+
+        <h2>Profile Image</h2>
+        <input 
+          type="file" 
+          name="profileImage" 
+          accept="image/*"
+          onChange={handleChange} 
+        />
+
         <h2>Personal Information</h2>
         <input 
           type="text" 
@@ -134,8 +192,54 @@ const TaskerForm = () => {
           <option value="Painting">Painting</option>
         </select>
 
+        <h2>Professional Information</h2>
+        <select 
+          name="experience" 
+          value={formData.experience} 
+          onChange={handleChange} 
+          required
+        >
+          <option value="">Select Experience Level</option>
+          <option value="Beginner">Beginner (0-1 years)</option>
+          <option value="Intermediate">Intermediate (1-3 years)</option>
+          <option value="Advanced">Advanced (3-5 years)</option>
+          <option value="Expert">Expert (5+ years)</option>
+        </select>
+        
+        <input 
+          type="number" 
+          name="hourlyRate" 
+          placeholder="Hourly Rate ($)" 
+          value={formData.hourlyRate} 
+          onChange={handleChange} 
+          min="10"
+          max="200"
+          required 
+        />
+        
+        <textarea 
+          name="bio" 
+          placeholder="Tell us about yourself and your experience..." 
+          value={formData.bio} 
+          onChange={handleChange} 
+          rows="4"
+          required
+        />
+        
+        <textarea 
+          name="skills" 
+          placeholder="List your key skills (e.g., Plumbing, Electrical work, Furniture assembly...)" 
+          value={formData.skills} 
+          onChange={handleChange} 
+          rows="3"
+          required
+        />
+
         <button type="submit">Submit Application</button>
         <button type="reset" onClick={() => setFormData({
+          username: '',
+          password: '',
+          confirmPassword: '',
           fullName: '',
           email: '',
           phoneNumber: '',
@@ -145,7 +249,12 @@ const TaskerForm = () => {
           stateProvince: '',
           postalCode: '',
           country: '',
-          category: ''
+          category: '',
+          experience: '',
+          hourlyRate: '',
+          bio: '',
+          skills: '',
+          profileImage: null
         })}>Reset Form</button>
         <p>Your information will be kept private.</p>
       </form>
