@@ -4,383 +4,300 @@ import TaskerNavbar from '../navbar/navbar';
 
 const TaskerProfile = () => {
   const [taskerData, setTaskerData] = useState({
-    fullName: 'John Smith',
-    username: 'johnsmith_handyman',
-    email: 'john.smith@email.com',
+    // Account Information
+    username: 'mikejohnson_handyman',
+    // Personal Information
+    fullName: 'Michael Johnson',
+    email: 'mike.johnson@email.com',
     phoneNumber: '+1 (555) 123-4567',
-    addressLine1: '123 Main Street',
-    addressLine2: 'Apt 2B',
-    city: 'New York',
-    stateProvince: 'NY',
-    postalCode: '10001',
+    // Address Information
+    addressLine1: '1234 Oak Street',
+    addressLine2: 'Apartment 2B',
+    city: 'San Francisco',
+    stateProvince: 'California',
+    postalCode: '94102',
     country: 'United States',
+    // Professional Information
     category: 'Home Repairs',
     experience: 'Advanced',
-    hourlyRate: 45,
-    bio: 'Professional handyman with 5+ years of experience in home repairs, electrical work, and plumbing. I take pride in delivering quality work and excellent customer service.',
-    skills: 'Plumbing, Electrical work, Drywall repair, Painting, Furniture assembly, Tile installation',
-    profileImage: null,
-    rating: 4.8,
-    totalJobs: 127,
-    joinDate: '2022-03-15'
+    hourlyRate: '45',
+    bio: 'Experienced handyman with over 5 years in home repairs and maintenance. I specialize in plumbing, electrical work, and general home improvements. Customer satisfaction is my top priority, and I always ensure quality workmanship. I have helped hundreds of homeowners with their repair needs and take pride in solving problems efficiently and affordably.',
+    skills: 'Plumbing, Electrical work, Furniture assembly, Painting, Drywall repair, Tile installation, Carpet installation, Window repair, Door installation, Kitchen cabinet mounting',
+    profileImage: null
   });
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({ ...taskerData });
 
-  const handleEdit = () => {
-    setIsEditing(true);
-    setEditData({ ...taskerData });
-  };
+  useEffect(() => {
+    // Fetch tasker data from API
+    fetchTaskerData();
+  }, []);
 
-  const handleSave = () => {
-    setTaskerData({ ...editData });
-    setIsEditing(false);
-    // Here you would typically make an API call to save the data
-    alert('Profile updated successfully!');
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    setEditData({ ...taskerData });
-  };
-
-  const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-    if (type === 'file') {
-      setEditData({ ...editData, [name]: files[0] });
-    } else {
-      setEditData({ ...editData, [name]: value });
+  const fetchTaskerData = async () => {
+    try {
+      // Replace with actual API call to get tasker data
+      const response = await fetch('http://localhost:5001/api/taskers/profile', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTaskerData(data);
+      }
+    } catch (error) {
+      console.error('Error fetching tasker data:', error);
     }
   };
 
+  const handleEdit = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/taskers/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(taskerData)
+      });
+      if (response.ok) {
+        setIsEditing(false);
+        alert('Profile updated successfully!');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTaskerData({ ...taskerData, [name]: value });
+  };
+
   return (
-    <div>
+    <>
       <TaskerNavbar />
       <div className="tasker-profile">
-        <div className="profile-container">
-          {/* Profile Header */}
-          <div className="profile-header">
-            <div className="profile-image-section">
-              <div className="profile-image">
-                {taskerData.profileImage ? (
-                  <img src={URL.createObjectURL(taskerData.profileImage)} alt="Profile" />
-                ) : (
-                  <div className="default-avatar">
-                    {taskerData.fullName.charAt(0)}
-                  </div>
-                )}
+        <div className="profile-header">
+          <div className="profile-image-section">
+            {taskerData.profileImage ? (
+              <img 
+                src={taskerData.profileImage} 
+                alt="Profile" 
+                className="profile-image"
+              />
+            ) : (
+              <div className="profile-image-placeholder">
+                <span>{taskerData.fullName?.charAt(0)}</span>
               </div>
+            )}
+          </div>
+          <div className="profile-basic-info">
+            <h1>{taskerData.fullName}</h1>
+            <p className="username">@{taskerData.username}</p>
+            <p className="category">{taskerData.category} Specialist</p>
+            <p className="hourly-rate">${taskerData.hourlyRate}/hour</p>
+            <div className="profile-actions">
+              <button onClick={handleEdit} className="edit-btn">
+                {isEditing ? 'Cancel' : 'Edit Profile'}
+              </button>
               {isEditing && (
-                <input
-                  type="file"
-                  name="profileImage"
-                  accept="image/*"
-                  onChange={handleChange}
-                  className="file-input"
-                />
+                <button onClick={handleSave} className="save-btn">
+                  Save Changes
+                </button>
               )}
             </div>
-            
-            <div className="profile-info">
-              <h1>{taskerData.fullName}</h1>
-              <p className="username">@{taskerData.username}</p>
-              <div className="profile-stats">
-                <div className="stat">
-                  <span className="stat-value">★ {taskerData.rating}</span>
-                  <span className="stat-label">Rating</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-value">{taskerData.totalJobs}</span>
-                  <span className="stat-label">Jobs Completed</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-value">${taskerData.hourlyRate}/hr</span>
-                  <span className="stat-label">Rate</span>
-                </div>
+          </div>
+        </div>
+
+        <div className="profile-content">
+          <div className="profile-section">
+            <h2>About Me</h2>
+            {isEditing ? (
+              <textarea
+                name="bio"
+                value={taskerData.bio}
+                onChange={handleChange}
+                rows="4"
+                className="edit-textarea"
+              />
+            ) : (
+              <p>{taskerData.bio}</p>
+            )}
+          </div>
+
+          <div className="profile-section">
+            <h2>Skills</h2>
+            {isEditing ? (
+              <textarea
+                name="skills"
+                value={taskerData.skills}
+                onChange={handleChange}
+                rows="3"
+                className="edit-textarea"
+              />
+            ) : (
+              <div className="skills-list">
+                {taskerData.skills?.split(',').map((skill, index) => (
+                  <span key={index} className="skill-tag">
+                    {skill.trim()}
+                  </span>
+                ))}
               </div>
-              
-              <div className="profile-actions">
-                {!isEditing ? (
-                  <button className="edit-btn" onClick={handleEdit}>
-                    Edit Profile
-                  </button>
+            )}
+          </div>
+
+          <div className="profile-section">
+            <h2>Professional Information</h2>
+            <div className="info-grid">
+              <div className="info-item">
+                <label>Category:</label>
+                {isEditing ? (
+                  <select name="category" value={taskerData.category} onChange={handleChange}>
+                    <option value="Assembly">Assembly</option>
+                    <option value="Mounting">Mounting</option>
+                    <option value="Moving">Moving</option>
+                    <option value="Cleaning">Cleaning</option>
+                    <option value="Outdoor Help">Outdoor Help</option>
+                    <option value="Home Repairs">Home Repairs</option>
+                    <option value="Painting">Painting</option>
+                  </select>
                 ) : (
-                  <div className="edit-actions">
-                    <button className="save-btn" onClick={handleSave}>
-                      Save Changes
-                    </button>
-                    <button className="cancel-btn" onClick={handleCancel}>
-                      Cancel
-                    </button>
-                  </div>
+                  <span>{taskerData.category}</span>
+                )}
+              </div>
+              <div className="info-item">
+                <label>Experience Level:</label>
+                {isEditing ? (
+                  <select name="experience" value={taskerData.experience} onChange={handleChange}>
+                    <option value="Beginner">Beginner (0-1 years)</option>
+                    <option value="Intermediate">Intermediate (1-3 years)</option>
+                    <option value="Advanced">Advanced (3-5 years)</option>
+                    <option value="Expert">Expert (5+ years)</option>
+                  </select>
+                ) : (
+                  <span>{taskerData.experience}</span>
+                )}
+              </div>
+              <div className="info-item">
+                <label>Hourly Rate:</label>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    name="hourlyRate"
+                    value={taskerData.hourlyRate}
+                    onChange={handleChange}
+                    min="10"
+                    max="200"
+                  />
+                ) : (
+                  <span>${taskerData.hourlyRate}/hour</span>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Main Content Grid */}
-          <div className="profile-main-grid">
-            {/* Left Column - Key Information */}
-            <div className="profile-left-column">
-              {/* Professional Information */}
-              <div className="profile-section">
-                <h2>Professional Information</h2>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <label>Category</label>
-                    {isEditing ? (
-                      <select
-                        name="category"
-                        value={editData.category}
-                        onChange={handleChange}
-                      >
-                        <option value="Assembly">Assembly</option>
-                        <option value="Mounting">Mounting</option>
-                        <option value="Moving">Moving</option>
-                        <option value="Cleaning">Cleaning</option>
-                        <option value="Outdoor Help">Outdoor Help</option>
-                        <option value="Home Repairs">Home Repairs</option>
-                        <option value="Painting">Painting</option>
-                      </select>
-                    ) : (
-                      <span className="category-badge">{taskerData.category}</span>
-                    )}
-                  </div>
-                  
-                  <div className="info-item">
-                    <label>Experience Level</label>
-                    {isEditing ? (
-                      <select
-                        name="experience"
-                        value={editData.experience}
-                        onChange={handleChange}
-                      >
-                        <option value="Beginner">Beginner (0-1 years)</option>
-                        <option value="Intermediate">Intermediate (1-3 years)</option>
-                        <option value="Advanced">Advanced (3-5 years)</option>
-                        <option value="Expert">Expert (5+ years)</option>
-                      </select>
-                    ) : (
-                      <span className="experience-badge">{taskerData.experience}</span>
-                    )}
-                  </div>
-                  
-                  <div className="info-item">
-                    <label>Hourly Rate</label>
-                    {isEditing ? (
-                      <input
-                        type="number"
-                        name="hourlyRate"
-                        value={editData.hourlyRate}
-                        onChange={handleChange}
-                        min="10"
-                        max="200"
-                      />
-                    ) : (
-                      <span className="rate">${taskerData.hourlyRate}/hr</span>
-                    )}
-                  </div>
-                  
-                  <div className="info-item full-width">
-                    <label>Bio</label>
-                    {isEditing ? (
-                      <textarea
-                        name="bio"
-                        value={editData.bio}
-                        onChange={handleChange}
-                        rows="4"
-                      />
-                    ) : (
-                      <p className="bio-text">{taskerData.bio}</p>
-                    )}
-                  </div>
-                  
-                  <div className="info-item full-width">
-                    <label>Skills</label>
-                    {isEditing ? (
-                      <textarea
-                        name="skills"
-                        value={editData.skills}
-                        onChange={handleChange}
-                        rows="3"
-                      />
-                    ) : (
-                      <div className="skills-container">
-                        {taskerData.skills.split(', ').map((skill, index) => (
-                          <span key={index} className="skill-tag">{skill}</span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
+          <div className="profile-section">
+            <h2>Contact Information</h2>
+            <div className="info-grid">
+              <div className="info-item">
+                <label>Email:</label>
+                {isEditing ? (
+                  <input
+                    type="email"
+                    name="email"
+                    value={taskerData.email}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  <span>{taskerData.email}</span>
+                )}
               </div>
-
-              {/* Account Information */}
-              <div className="profile-section">
-                <h2>Account Information</h2>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <label>Member Since</label>
-                    <span>{new Date(taskerData.joinDate).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}</span>
-                  </div>
-                  
-                  <div className="info-item">
-                    <label>Account Status</label>
-                    <span className="status-active">Active</span>
-                  </div>
-                </div>
+              <div className="info-item">
+                <label>Phone:</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="phoneNumber"
+                    value={taskerData.phoneNumber}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  <span>{taskerData.phoneNumber}</span>
+                )}
               </div>
             </div>
+          </div>
 
-            {/* Right Column - Contact & Address */}
-            <div className="profile-right-column">
-              {/* Personal Information */}
-              <div className="profile-section">
-                <h2>Contact Information</h2>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <label>Full Name</label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        name="fullName"
-                        value={editData.fullName}
-                        onChange={handleChange}
-                      />
-                    ) : (
-                      <span>{taskerData.fullName}</span>
-                    )}
+          <div className="profile-section">
+            <h2>Address</h2>
+            <div className="address-info">
+              {isEditing ? (
+                <div className="address-edit">
+                  <input
+                    type="text"
+                    name="addressLine1"
+                    placeholder="Address Line 1"
+                    value={taskerData.addressLine1}
+                    onChange={handleChange}
+                  />
+                  <input
+                    type="text"
+                    name="addressLine2"
+                    placeholder="Address Line 2"
+                    value={taskerData.addressLine2}
+                    onChange={handleChange}
+                  />
+                  <div className="address-row">
+                    <input
+                      type="text"
+                      name="city"
+                      placeholder="City"
+                      value={taskerData.city}
+                      onChange={handleChange}
+                    />
+                    <input
+                      type="text"
+                      name="stateProvince"
+                      placeholder="State/Province"
+                      value={taskerData.stateProvince}
+                      onChange={handleChange}
+                    />
                   </div>
-                  
-                  <div className="info-item">
-                    <label>Email</label>
-                    {isEditing ? (
-                      <input
-                        type="email"
-                        name="email"
-                        value={editData.email}
-                        onChange={handleChange}
-                      />
-                    ) : (
-                      <span>{taskerData.email}</span>
-                    )}
-                  </div>
-                  
-                  <div className="info-item">
-                    <label>Phone Number</label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        name="phoneNumber"
-                        value={editData.phoneNumber}
-                        onChange={handleChange}
-                      />
-                    ) : (
-                      <span>{taskerData.phoneNumber}</span>
-                    )}
+                  <div className="address-row">
+                    <input
+                      type="text"
+                      name="postalCode"
+                      placeholder="Postal Code"
+                      value={taskerData.postalCode}
+                      onChange={handleChange}
+                    />
+                    <input
+                      type="text"
+                      name="country"
+                      placeholder="Country"
+                      value={taskerData.country}
+                      onChange={handleChange}
+                    />
                   </div>
                 </div>
-              </div>
-
-              {/* Address Information */}
-              <div className="profile-section">
-                <h2>Address Information</h2>
-                <div className="info-grid">
-                  <div className="info-item full-width">
-                    <label>Address Line 1</label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        name="addressLine1"
-                        value={editData.addressLine1}
-                        onChange={handleChange}
-                      />
-                    ) : (
-                      <span>{taskerData.addressLine1}</span>
-                    )}
-                  </div>
-                  
-                  <div className="info-item full-width">
-                    <label>Address Line 2</label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        name="addressLine2"
-                        value={editData.addressLine2}
-                        onChange={handleChange}
-                      />
-                    ) : (
-                      <span>{taskerData.addressLine2 || 'N/A'}</span>
-                    )}
-                  </div>
-                  
-                  <div className="info-item">
-                    <label>City</label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        name="city"
-                        value={editData.city}
-                        onChange={handleChange}
-                      />
-                    ) : (
-                      <span>{taskerData.city}</span>
-                    )}
-                  </div>
-                  
-                  <div className="info-item">
-                    <label>State/Province</label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        name="stateProvince"
-                        value={editData.stateProvince}
-                        onChange={handleChange}
-                      />
-                    ) : (
-                      <span>{taskerData.stateProvince}</span>
-                    )}
-                  </div>
-                  
-                  <div className="info-item">
-                    <label>Postal Code</label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        name="postalCode"
-                        value={editData.postalCode}
-                        onChange={handleChange}
-                      />
-                    ) : (
-                      <span>{taskerData.postalCode}</span>
-                    )}
-                  </div>
-                  
-                  <div className="info-item">
-                    <label>Country</label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        name="country"
-                        value={editData.country}
-                        onChange={handleChange}
-                      />
-                    ) : (
-                      <span>{taskerData.country}</span>
-                    )}
-                  </div>
+              ) : (
+                <div className="address-display">
+                  <p>{taskerData.addressLine1}</p>
+                  {taskerData.addressLine2 && <p>{taskerData.addressLine2}</p>}
+                  <p>{taskerData.city}, {taskerData.stateProvince} {taskerData.postalCode}</p>
+                  <p>{taskerData.country}</p>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
