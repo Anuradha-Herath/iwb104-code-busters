@@ -1,6 +1,6 @@
 // src/App.jsx
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './Components/Navbar/Navbar';
 import ServiceCards from './Components/ServiseCards/ServiceCards';
 import './App.css';
@@ -12,29 +12,39 @@ import ProfilePage from './Components/Profilepage/Profilepage';
 import Seller from './Components/Seller/seller';
 import BookingForm from './Components/Book/Book';
 import AboutUs from './Components/AboutUs/AboutUs';
+import Admin from './Components/Admin/Admin';
+
+const AppContent = () => {
+  const location = useLocation();
+
+  // List of routes where you don't want to show the Navbar
+  const hideNavbarPaths = ['/admin'];
+
+  return (
+    <div className="app-container">
+      {/* Only show Navbar if current path is NOT in hideNavbarPaths */}
+      {!hideNavbarPaths.includes(location.pathname) && <Navbar />}
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/services" element={<ServiceCards />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/become-tasker" element={<TaskerForm />} />
+        <Route path="/profilepage" element={<ProfilePage />} />
+        <Route path="/seller" element={<Seller />} />
+        <Route path="/book" element={<BookingForm />} />
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
+    </div>
+  );
+};
 
 const App = () => {
   return (
     <Router>
-      <div className="app-container">
-        <Navbar />  {/* The Navbar will remain common across all pages */}
-
-        {/* Set up routing */}
-        <Routes>
-          <Route path="/" element={<Home />} />  {/* Home or landing page */}
-          <Route path="/services" element={<ServiceCards />} />  {/* Services page */}
-          <Route path="/about" element={<AboutUs />} />  {/* About page */}
-          <Route path="/signup" element={<SignUp />} />  {/* Signup page */}
-          <Route path="/login" element={<Login />} />  {/* Login page */}
-          <Route path="/become-tasker" element={<TaskerForm />} />  {/* TaskerForm page */}
-          <Route path="/profilepage" element={<ProfilePage />} />  {/* Profile page */}
-          <Route path="/seller" element={<Seller />} />
-          <Route path="/book" element={<BookingForm />} />
-          {/* Add more routes as needed */}
-        </Routes>
-
-        {/* Footer will be placed at the bottom */}
-      </div>
+      <AppContent />
     </Router>
   );
 };
